@@ -1,13 +1,13 @@
-package com.docker.jwt.UserService;
+package com.docker.jwt.Service;
 
 import com.docker.jwt.Domain.User;
+import com.docker.jwt.Domain.UserCredentional;
 import com.docker.jwt.Dto.SignUpResponse;
-import com.docker.jwt.RedisService;
 import com.docker.jwt.Repository.UserRepository;
-import com.docker.jwt.security.JwtProvider;
-import com.docker.jwt.security.JwtTokens;
-import com.docker.jwt.security.Role;
-import com.docker.jwt.security.TokenType;
+import com.docker.jwt.Security.JwtProvider;
+import com.docker.jwt.Security.JwtTokens;
+import com.docker.jwt.Security.Role;
+import com.docker.jwt.Security.TokenType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
@@ -39,8 +39,7 @@ public class UserService {
         String encodingPassword = passwordEncoder.encode(password);
 
         User newUser = createGeneratedUser(username, encodingPassword, email);
-        User result = userRepository.save(newUser);
-        if(result == null) {throw new RuntimeException("User with email " + email + " already exists");}
+        if(newUser == null) {throw new RuntimeException("User with email " + email + " already exists");}
         return new SignUpResponse(username, new Date());
     }
 
@@ -67,7 +66,9 @@ public class UserService {
     }
 
     private User createGeneratedUser(String username, String password, String email) {
-        User user = new User(username, password, email, Role.getRoles("USER"));
-        return user;
+        UserCredentional userCredentional = new UserCredentional(password);
+        User user = new User(username, email, Role.getRoles("USER"), userCredentional);
+        userCredentional.setUser(user);
+        return userRepository.save(user);
     }
 }

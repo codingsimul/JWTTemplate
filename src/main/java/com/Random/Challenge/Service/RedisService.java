@@ -1,4 +1,4 @@
-package com.docker.jwt;
+package com.docker.jwt.Service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
